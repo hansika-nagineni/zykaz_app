@@ -1,9 +1,10 @@
 name: Build Android APK
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -12,24 +13,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
-            python3-pip python3-setuptools \
-            build-essential libffi-dev libssl-dev
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-      - name: Install Buildozer
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept SDK licenses and install Build Tools
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip3 install buildozer cython
+          pip install buildozer cython
 
       - name: Build APK
-        run: buildozer android debug
+        run: |
+          buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: apk
+          name: APK
           path: bin/*.apk
