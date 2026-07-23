@@ -11,14 +11,13 @@ version = 1.0
 requirements = python3,kivy
 
 orientation = portrait
-
 fullscreen = 0
 
 android.permissions = INTERNET
 
+android.api = 34
+android.minapi = 21
+android.ndk = 25b
+
 presplash.filename =
 icon.filename =
-
-[buildozer]
-log_level = 2
-warn_on_root = 1
